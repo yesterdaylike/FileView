@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">FileView</string>
+    <string name="drawer_close">drawer close</string>
+    <string name="drawer_open">drawer open</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="copy">copy</string>
+    <string name="delete">delete</string>
+    <string name="cut">cut</string>
+    <string name="paste">paste</string>
+    <string name="rename">rename</string>
+    <string name="share">share</string>
+    <string name="shortcut">shortcut</string>
+    <string name="detail">detail</string>
+    <string name="search">search</string>
+    <string name="add_floder">new floder</string>
+    <string name="str_mkdir">NewFolder</string>
+    <string name="wrong_file_name">not a file name</string>
+    <string name="directory_is_exist_already">A directory already exists with this name.</string>
+    <string name="str_newdir_text">Please input the folder name :</string>
+</resources>

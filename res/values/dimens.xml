@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="listPreferredItemHeight">64dip</dimen>
+    <dimen name="listPreferredItemHeightSmall">48dip</dimen>
+    <dimen name="listPreferredItemHeightLarge">80dip</dimen>
+    <dimen name="action_bar_default_height">48dip</dimen>
+
+</resources>

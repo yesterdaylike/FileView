@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/add_folder"
+        android:icon="@drawable/d_actionbar_icon_add_folder_enabled"
+        android:showAsAction="always"
+        android:visible="false"
+        android:title="@string/add_floder"/>
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/d_actionbar_icon_search_enabled"
+        android:showAsAction="always"
+        android:title="@string/search"/>
+    <item
+        android:id="@+id/paste"
+        android:icon="@drawable/d_actionbar_icon_paste_enabled"
+        android:showAsAction="always"
+        android:visible="false"
+        android:title="@string/paste"/>
+
+</menu>
