@@ -4,8 +4,6 @@
     <string name="app_name">FileView</string>
     <string name="drawer_close">drawer close</string>
     <string name="drawer_open">drawer open</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="copy">copy</string>
     <string name="delete">delete</string>
     <string name="cut">cut</string>
@@ -20,4 +18,16 @@
     <string name="wrong_file_name">not a file name</string>
     <string name="directory_is_exist_already">A directory already exists with this name.</string>
     <string name="str_newdir_text">Please input the folder name :</string>
+    <string name="str_rename_text">Please input new name :</string>
+    <string name="delete_file_failed">Failed to delete file</string>
+    <string name="sure_delete_file">Sure to delete</string>
+    <string name="file_is_exist_already">A file already exists with this name.</string>
+    <string name="rename_file_failed">Failed to rename file</string>
+    <string name="send">Send</string>
+    <string name="no_apps_to_send">There is no application fits. </string>
+    <string name="paste_file_failed">Failed to paste file</string>
+    <string name="cut_file_failed">Failed to cut file</string>
+    <string name="cut_file_to_clipboard">cut in clipboard</string>
+    <string name="copy_file_to_clipboard">copy to clipboard</string>
+
 </resources>
