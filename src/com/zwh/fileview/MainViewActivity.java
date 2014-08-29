@@ -19,7 +19,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -41,7 +43,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainViewActivity extends Activity {
-	private String[] mPlanetTitles = {"device","network","cloud"};
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private ListView mMainListView;
@@ -54,6 +55,13 @@ public class MainViewActivity extends Activity {
 	private File currentFile;
 	private File mClipboard;
 	private boolean mCut = false;
+
+	private String[] mIndexDirectory= {
+			File.listRoots()[0].getPath(),
+			Environment.getExternalStorageDirectory().getPath(),
+			"/mnt/external_sd",
+			"/mnt/usb_storage",
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +76,7 @@ public class MainViewActivity extends Activity {
 
 		mIndexListView = (ListView) findViewById(R.id.index_view);
 		mIndexListView.setAdapter(new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, mPlanetTitles));
+				android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.general_dir)));
 		mIndexListView.setOnItemClickListener(new DrawerItemClickListener());
 
 		setDrawerToggle();
@@ -88,7 +96,7 @@ public class MainViewActivity extends Activity {
 		bar.setDisplayShowTitleEnabled(false);
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-		addTab(File.listRoots()[0]);
+		addTab(new File(mIndexDirectory[0]));
 	}
 
 	private void refrestTab(String path){
@@ -473,7 +481,10 @@ public class MainViewActivity extends Activity {
 				holder = (ViewHolder) convertView.getTag();
 			}  
 
-			holder.fileNameTextView.setText(fileList[position].getName());  
+			holder.fileNameTextView.setText(fileList[position].getName());
+			Drawable drawableLeft = FileOpertion.getDrawable(mContext, fileList[position]);
+			//drawableLeft.setBounds(1, 1, 50, 1);
+			holder.fileNameTextView.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, null, null, null);
 			return convertView;
 		}  
 
@@ -638,13 +649,13 @@ public class MainViewActivity extends Activity {
 				map.put(rhs, rkey);
 			}
 
-			/*if(rhs.isDirectory() && lhs.isFile()){
+			if(rhs.isDirectory() && !lhs.isDirectory()){
 				return 1;
 			}
 
-			if(rhs.isFile() && lhs.isDirectory()){
+			if(!rhs.isDirectory() && lhs.isDirectory()){
 				return -1;
-			}*/
+			}
 
 			return lkey.compareTo(rkey);
 		}
@@ -653,15 +664,10 @@ public class MainViewActivity extends Activity {
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			selectItem(position);
+			//selectItem(position);
+			mDrawerLayout.closeDrawer(mIndexListView);
+			refrestTab(mIndexDirectory[position]);
 		}
-	}
-
-	/** Swaps fragments in the main content view */
-	private void selectItem(int position) {
-		mIndexListView.setItemChecked(position, true);
-		setTitle(mPlanetTitles[position]);
-		mDrawerLayout.closeDrawer(mIndexListView);
 	}
 
 	@Override

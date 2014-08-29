@@ -5,14 +5,21 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 public class FileOpertion {
@@ -72,16 +79,16 @@ public class FileOpertion {
 		}
 		return ret;
 	}
-	
+
 	public static int cutPasteFile(File sourceFile , File newDir){
 		Log.i(TAG, "cutPasteFile: "+sourceFile.getPath()+" to: "+newDir.getPath());
 		int ret = SUCCESS;
 		File newFile = new File(newDir, sourceFile.getName());
-		
+
 		if(newFile.exists()){
 			ret = FILE_IS_ALREADY_EXITS;
 		}
-		
+
 		else{
 			if(sourceFile.renameTo(newFile)){
 				ret = SUCCESS;
@@ -143,7 +150,7 @@ public class FileOpertion {
 
 			intent.putExtra(SHORTCUT_PATH, fileInfo.getPath());
 			icon = Intent.ShortcutIconResource.fromContext(
-					context, R.drawable.folder);
+					context, R.drawable.ic_drive_floder);
 		} else {
 			intent = new Intent();
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -259,21 +266,105 @@ public class FileOpertion {
 	}
 
 	public static int getDrawableId(String tmp_type){
-		/*int drawableId = -1;
+		int drawableId = R.drawable.ic_drive_unknown;
 		if(tmp_type.equals(str_audio_type)){
-			drawableId = R.drawable.audio;
+			drawableId = R.drawable.ic_drive_audio;
 		}else if(tmp_type.equals(str_video_type)){
-			drawableId = R.drawable.video;
+			drawableId = R.drawable.ic_drive_video;
 		}else if(tmp_type.equals(str_image_type)){
-			drawableId = R.drawable.image;
-		}else if(tmp_type.equals(str_txt_type) || tmp_type.equals(str_pdf_type) || tmp_type.equals(str_epub_type)){
-			drawableId = R.drawable.storage_list;
+			drawableId = R.drawable.ic_drive_image;
+		}else if(tmp_type.equals(str_txt_type)){
+			drawableId = R.drawable.ic_drive_docs;
+		}else if(tmp_type.equals(str_pdf_type)){
+			drawableId = R.drawable.ic_drive_pdf;
+		}else if(tmp_type.equals(str_epub_type)){
+			drawableId = R.drawable.ic_drive_unknown;
 		}else if(tmp_type.equals(str_apk_type)){
-			drawableId = R.drawable.apk;
-		}else {
-			drawableId = R.drawable.blank_page;
-		}*/
-		return R.drawable.folder;
+			drawableId = R.drawable.ic_drive_apk;
+		}
+
+		return drawableId;
+	}
+	
+	public static Drawable getDrawable(Context context,File file){
+		int drawableId;
+		Drawable drawable;
+		
+		if(file.isDirectory()){
+			drawableId = R.drawable.ic_drive_floder;
+		}
+		else{
+			String tmp_type = getMIMEType(file, context);
+			drawableId = getDrawableId(tmp_type);
+		}
+		
+		
+		if( drawableId == R.drawable.ic_drive_apk ){
+			drawable = getApkIcon(context, file.getPath());
+		}
+		else{
+			drawable = context.getResources().getDrawable(drawableId);
+		}
+		
+		return drawable;
+	}
+
+	public static Drawable getApkIcon(Context context, String Path) {
+		// 未安装的程序通过apk文件获取icon
+		String apkPath = Path; // apk 文件所在的路径
+		String PATH_PackageParser = "android.content.pm.PackageParser";
+		String PATH_AssetManager = "android.content.res.AssetManager";
+		try {
+			Class<?> pkgParserCls = Class.forName(PATH_PackageParser);
+			Class<?>[] typeArgs = { String.class };
+			Constructor<?> pkgParserCt = pkgParserCls.getConstructor(typeArgs);
+			Object[] valueArgs = { apkPath };
+			Object pkgParser = pkgParserCt.newInstance(valueArgs);
+			DisplayMetrics metrics = new DisplayMetrics();
+			metrics.setToDefaults();
+			typeArgs = new Class<?>[] { File.class, String.class,
+					DisplayMetrics.class, int.class };
+			Method pkgParser_parsePackageMtd = pkgParserCls.getDeclaredMethod(
+					"parsePackage", typeArgs);
+			valueArgs = new Object[] { new File(apkPath), apkPath, metrics, 0 };
+			Object pkgParserPkg = pkgParser_parsePackageMtd.invoke(pkgParser,
+					valueArgs);
+			Field appInfoFld = pkgParserPkg.getClass().getDeclaredField(
+					"applicationInfo");
+			ApplicationInfo info = (ApplicationInfo) appInfoFld
+					.get(pkgParserPkg);
+			Class<?> assetMagCls = Class.forName(PATH_AssetManager);
+			Object assetMag = assetMagCls.newInstance();
+			typeArgs = new Class[1];
+			typeArgs[0] = String.class;
+			Method assetMag_addAssetPathMtd = assetMagCls.getDeclaredMethod(
+					"addAssetPath", typeArgs);
+			valueArgs = new Object[1];
+			valueArgs[0] = apkPath;
+			assetMag_addAssetPathMtd.invoke(assetMag, valueArgs);
+			Resources res = context.getResources();
+			typeArgs = new Class[3];
+			typeArgs[0] = assetMag.getClass();
+			typeArgs[1] = res.getDisplayMetrics().getClass();
+			typeArgs[2] = res.getConfiguration().getClass();
+			Constructor<Resources> resCt = Resources.class
+					.getConstructor(typeArgs);
+			valueArgs = new Object[3];
+			valueArgs[0] = assetMag;
+			valueArgs[1] = res.getDisplayMetrics();
+			valueArgs[2] = res.getConfiguration();
+			res = (Resources) resCt.newInstance(valueArgs);
+			if (info != null) {
+				if (info.icon != 0) {
+					Drawable icon = res.getDrawable(info.icon);
+					return icon;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+
 	}
 
 	//分享功能

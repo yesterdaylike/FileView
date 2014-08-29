@@ -30,4 +30,11 @@
     <string name="cut_file_to_clipboard">cut in clipboard</string>
     <string name="copy_file_to_clipboard">copy to clipboard</string>
 
+    <string-array name="general_dir">
+        <item>Home</item>
+        <item>SD Card</item>
+        <item>External SD</item>
+        <item>USB Storage</item>
+    </string-array>
+
 </resources>

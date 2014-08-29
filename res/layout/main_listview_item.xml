@@ -1,11 +1,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
 
+<!--     <ImageView
+        android:id="@+id/file_icon_iamgeview"
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeight" />
+ -->
     <TextView
         android:id="@+id/file_name_textview"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
+        android:drawableLeft="@drawable/ic_drive_unknown"
         android:gravity="center_vertical"
         android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
         android:textAlignment="viewStart"

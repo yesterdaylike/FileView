@@ -8,6 +8,9 @@
 package com.zwh.fileview;
 
 public final class R {
+    public static final class array {
+        public static final int general_dir=0x7f070000;
+    }
     public static final class attr {
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
@@ -53,31 +56,41 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int d_actionbar_icon_share_enabled=0x7f020016;
         public static final int folder=0x7f020017;
         public static final int ic_drawer_light=0x7f020018;
-        public static final int ic_launcher=0x7f020019;
+        public static final int ic_drive_apk=0x7f020019;
+        public static final int ic_drive_audio=0x7f02001a;
+        public static final int ic_drive_docs=0x7f02001b;
+        public static final int ic_drive_floder=0x7f02001c;
+        public static final int ic_drive_image=0x7f02001d;
+        public static final int ic_drive_pdf=0x7f02001e;
+        public static final int ic_drive_text=0x7f02001f;
+        public static final int ic_drive_unknown=0x7f020020;
+        public static final int ic_drive_video=0x7f020021;
+        public static final int ic_launcher=0x7f020022;
+        public static final int pdf=0x7f020023;
     }
     public static final class id {
-        public static final int add_folder=0x7f080004;
-        public static final int copy=0x7f080007;
-        public static final int cut=0x7f080009;
-        public static final int delete=0x7f080008;
-        public static final int detail=0x7f08000d;
-        public static final int drawer_layout=0x7f080000;
-        public static final int file_name_textview=0x7f080003;
-        public static final int index_view=0x7f080002;
-        public static final int main_view=0x7f080001;
-        public static final int paste=0x7f080006;
-        public static final int rename=0x7f08000a;
-        public static final int search=0x7f080005;
-        public static final int share=0x7f08000b;
-        public static final int shortcut=0x7f08000c;
+        public static final int add_folder=0x7f090004;
+        public static final int copy=0x7f090007;
+        public static final int cut=0x7f090009;
+        public static final int delete=0x7f090008;
+        public static final int detail=0x7f09000d;
+        public static final int drawer_layout=0x7f090000;
+        public static final int file_name_textview=0x7f090003;
+        public static final int index_view=0x7f090002;
+        public static final int main_view=0x7f090001;
+        public static final int paste=0x7f090006;
+        public static final int rename=0x7f09000a;
+        public static final int search=0x7f090005;
+        public static final int share=0x7f09000b;
+        public static final int shortcut=0x7f09000c;
     }
     public static final class layout {
         public static final int activity_mainview=0x7f030000;
         public static final int main_listview_item=0x7f030001;
     }
     public static final class menu {
-        public static final int action=0x7f070000;
-        public static final int contextual_action=0x7f070001;
+        public static final int action=0x7f080000;
+        public static final int contextual_action=0x7f080001;
     }
     public static final class string {
         public static final int add_floder=0x7f06000c;
