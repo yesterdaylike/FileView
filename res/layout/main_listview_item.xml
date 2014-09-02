@@ -3,18 +3,20 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
 
-<!--     <ImageView
+    <ImageView
         android:id="@+id/file_icon_iamgeview"
-        android:layout_width="wrap_content"
-        android:layout_height="?android:attr/listPreferredItemHeight" />
- -->
+        android:layout_width="?android:attr/listPreferredItemHeight"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:layout_marginStart="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:scaleType="center"
+        android:src="@drawable/ic_drive_floder" />
+
     <TextView
         android:id="@+id/file_name_textview"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
-        android:drawableLeft="@drawable/ic_drive_unknown"
         android:gravity="center_vertical"
-        android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:paddingStart="?android:attr/expandableListPreferredItemIndicatorLeft"
         android:textAlignment="viewStart"
         android:textAppearance="?android:attr/textAppearanceListItem" >
     </TextView>

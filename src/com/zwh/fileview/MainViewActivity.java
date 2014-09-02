@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.w3c.dom.Text;
+
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -38,6 +40,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +50,7 @@ public class MainViewActivity extends Activity {
 	private ActionBarDrawerToggle mDrawerToggle;
 	private ListView mMainListView;
 	private ListView mIndexListView;
+	private TextView mPromptTextView;
 
 	private ListViewAdapter mMainListViewAdapter;
 	private Menu mOptionsMenu;
@@ -67,6 +71,8 @@ public class MainViewActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_mainview);
+		mPromptTextView = (TextView) findViewById(R.id.prompt_view);
+
 		mMainListView = (ListView) findViewById(R.id.main_view);
 		mMainListViewAdapter = new ListViewAdapter(this, File.listRoots()[0].listFiles());
 		mMainListView.setAdapter(mMainListViewAdapter);
@@ -233,6 +239,7 @@ public class MainViewActivity extends Activity {
 					FileOpertion.addShortcut(MainViewActivity.this, selected);
 					break;
 				case R.id.share:
+					FileOpertion.shareFiles(MainViewActivity.this, selected);
 					break;
 				case R.id.detail:
 					break;
@@ -405,11 +412,11 @@ public class MainViewActivity extends Activity {
 			Log.i("MainListOnItemClickListener", "position:"+position+",currentFile:"+currentFile.getName());
 			Log.v("v","isDirectory: "+ currentFile.isDirectory() );
 			if( currentFile.isDirectory() ){
-				refreshList(currentFile.listFiles());
+				//refreshList(currentFile.listFiles());
 				addTab(currentFile);
 			}
 			else{
-				//open
+				FileOpertion.openFile(MainViewActivity.this, currentFile);
 			}
 		}
 	}
@@ -475,6 +482,7 @@ public class MainViewActivity extends Activity {
 				convertView = LayoutInflater.from(mContext).inflate(  
 						R.layout.main_listview_item, null);
 				holder.fileNameTextView = (TextView) convertView.findViewById(R.id.file_name_textview);  
+				holder.fileIconImageView = (ImageView) convertView.findViewById(R.id.file_icon_iamgeview);  
 
 				convertView.setTag(holder);
 			} else {  
@@ -484,7 +492,8 @@ public class MainViewActivity extends Activity {
 			holder.fileNameTextView.setText(fileList[position].getName());
 			Drawable drawableLeft = FileOpertion.getDrawable(mContext, fileList[position]);
 			//drawableLeft.setBounds(1, 1, 50, 1);
-			holder.fileNameTextView.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, null, null, null);
+			//holder.fileNameTextView.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, null, null, null);
+			holder.fileIconImageView.setImageDrawable(drawableLeft);
 			return convertView;
 		}  
 
@@ -493,6 +502,7 @@ public class MainViewActivity extends Activity {
 		 */  
 		final class ViewHolder {  
 			TextView fileNameTextView;
+			ImageView fileIconImageView;
 		}
 	}  
 
@@ -612,6 +622,13 @@ public class MainViewActivity extends Activity {
 	}
 
 	private void refreshList(File[] dataList){
+		if( null == dataList || dataList.length < 1){
+			Log.e(TAG, "wow this floder is empty!");
+			mPromptTextView.setVisibility(View.VISIBLE);
+		}
+		else if(mPromptTextView.getVisibility()==View.VISIBLE){
+			mPromptTextView.setVisibility(View.INVISIBLE);
+		}
 		mMainListViewAdapter.setFileData(dataList);
 		mMainListViewAdapter.notifyDataSetChanged();
 		mMainListView.invalidate();

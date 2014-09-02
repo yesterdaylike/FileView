@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -17,10 +19,12 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.Toast;
 
 public class FileOpertion {
 	private static String TAG = "FileOpertion";
@@ -38,6 +42,8 @@ public class FileOpertion {
 	public static final String str_pdf_type = "application/pdf";
 	public static final String str_epub_type = "application/epub+zip";
 	public static final String str_apk_type = "application/vnd.android.package-archive";
+
+	public static final String str_flash_path = Environment.getExternalStorageDirectory().getPath();
 
 	public static boolean DelFile(File delFile){
 		Log.i(TAG, "DelFile: "+delFile.getPath());
@@ -127,7 +133,7 @@ public class FileOpertion {
 	 *            
 	 */
 	public static void addShortcut(Context context , File fileInfo) {
-		String file_type = getMIMEType(fileInfo, context);
+		String file_type = getMIMEType(context, fileInfo);
 
 		// 创建快捷方式的Intent
 		Intent shortcutIntent = new Intent(
@@ -169,7 +175,7 @@ public class FileOpertion {
 
 
 	/* 判断文件MimeType的方法 */
-	public static String getMIMEType(File file, Context context)
+	public static String getMIMEType(Context context, File file)
 	{ 
 		String type="";
 		String fileName=file.getName();
@@ -207,7 +213,7 @@ public class FileOpertion {
 		{
 			type = str_video_type;
 			if(end.equalsIgnoreCase("3gpp")){
-				if(isVideoFile(file, context)){
+				if(isVideoFile(context, file)){
 					type = str_video_type;
 				}else{
 					type = str_audio_type; 
@@ -245,7 +251,7 @@ public class FileOpertion {
 		return type; 
 	}
 
-	public static boolean isVideoFile(File tmp_file, Context context){
+	public static boolean isVideoFile(Context context, File tmp_file){
 		String path = tmp_file.getPath();
 		ContentResolver resolver = context.getContentResolver();
 		String[] audiocols = new String[] {
@@ -285,27 +291,27 @@ public class FileOpertion {
 
 		return drawableId;
 	}
-	
+
 	public static Drawable getDrawable(Context context,File file){
 		int drawableId;
 		Drawable drawable;
-		
+
 		if(file.isDirectory()){
 			drawableId = R.drawable.ic_drive_floder;
 		}
 		else{
-			String tmp_type = getMIMEType(file, context);
+			String tmp_type = getMIMEType(context, file);
 			drawableId = getDrawableId(tmp_type);
 		}
-		
-		
+
+
 		if( drawableId == R.drawable.ic_drive_apk ){
 			drawable = getApkIcon(context, file.getPath());
 		}
 		else{
 			drawable = context.getResources().getDrawable(drawableId);
 		}
-		
+
 		return drawable;
 	}
 
@@ -366,45 +372,6 @@ public class FileOpertion {
 		return null;
 
 	}
-
-	//分享功能
-	/*private static final String [] filterList = {"com.google.android.gm"};
-	public static String flash_dir = Environment.getExternalStorageDirectory().getPath();
-
-	private void shareFiles(String currenPath, Context context) {
-		ArrayList<File> multi_path = new ArrayList<File>();
-
-		if(currenPath == null ) {
-			return;
-		}
-		if(currenPath.startsWith(flash_dir)) {
-			ShareIntent.SetFilter(new String[]{});
-		} else {
-			ShareIntent.SetFilter(filterList);
-		}
-
-		ArrayList<Uri> srcSends = getUris(multi_path);
-		//System.out.println("srcSends:" + srcSends);
-		if (srcSends.size() == 1) {
-			//System.out.println("srcSends.size() == 1");
-			File mListtmp = multi_path.get(0);
-			String file_type = getMIMEType(mListtmp, context);
-
-			if("application/vnd.android.package-archive".equals(file_type)) {
-				file_type = "application/zip";
-			}
-			ShareIntent.shareFile(context, file_type, srcSends.get(0));
-		} else if (srcSends.size() > 1) {
-			//System.out.println("srcSends.size() > 1");
-			ShareIntent.shareMultFile(context, "x-mixmedia/*", srcSends);
-		}
-
-		if (is_multi_choice) { // 若是在多选取状态下的话，则去除多选状态
-			is_multi_choice = !is_multi_choice;
-			multi_choice_process(is_multi_choice);
-		}
-		multi_path = new ArrayList<FileInfo>();
-	}*/
 
 	public static int Copy(File file,String newName){
 		Log.i(TAG, "RenameFile: "+file.getPath()+" to: "+newName);
@@ -470,5 +437,96 @@ public class FileOpertion {
 			}
 		}
 		return ret;
+	}
+	public static void openFile(Context context, File file){
+		String fileType = getMIMEType(context, file);
+
+		Intent intent = new Intent();
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setAction(android.content.Intent.ACTION_VIEW);
+
+		intent.setDataAndType(Uri.fromFile(file),fileType);
+
+		try {
+			context.startActivity(intent);
+		} catch (android.content.ActivityNotFoundException e) {
+			Toast.makeText(context,
+					context.getString(R.string.no_apps_to_send), Toast.LENGTH_SHORT)
+					.show();
+		}
+	}
+
+	/** 转换文件大小 **/
+	public static String formetFileSize(long fileS) {
+		DecimalFormat df = new DecimalFormat("#.00");
+		String fileSizeString = "";
+		if (fileS < 1024) {
+			fileSizeString = fileS + " B";
+		} else if (fileS < 1048576) {
+			fileSizeString = df.format((double) fileS / 1024) + " K";
+		} else if (fileS < 1073741824) {
+			fileSizeString = df.format((double) fileS / 1048576) + " M";
+		} else {
+			fileSizeString = df.format((double) fileS / 1073741824) + " G";
+		}
+		return fileSizeString;
+	}
+
+
+	public static ArrayList<Uri> getUris(ArrayList<File> files) {
+		ArrayList<Uri> uris = new ArrayList<Uri>();
+		for (File mfile : files) {
+			addFileUri(mfile, uris);
+		}
+		return uris;
+	}
+
+	public static void addFileUri(File mfile, ArrayList<Uri> uris) {
+		if (mfile.isDirectory()) {
+			File[] files = mfile.listFiles();
+			if( null != files && files.length > 0){
+				for (File file : files) {
+					addFileUri(file, uris);
+				}
+			}
+		} else {
+			uris.add(Uri.fromFile(mfile));
+		}
+	}
+
+	private static final String [] filterList = {"com.google.android.gm"};
+	public static void shareFiles(Context context, File currentFile) {
+
+		ArrayList<File> multi_path = new ArrayList<File>();
+		multi_path.add(currentFile);
+
+		String currenPath = currentFile.getPath();
+
+		if(currenPath == null ) {
+			return;
+		}
+		if(currenPath.startsWith(str_flash_path)) {
+			ShareIntent.SetFilter(new String[]{});
+		} else {
+			ShareIntent.SetFilter(filterList);
+		}
+
+		ArrayList<Uri> srcSends = getUris(multi_path);
+		if (srcSends.size() == 1) {
+			File file = multi_path.get(0);
+			String fileType = getMIMEType(context, file);
+
+			if("application/vnd.android.package-archive".equals(fileType)) {
+				fileType = "application/zip";
+			}
+			ShareIntent.shareFile(context, fileType, srcSends.get(0));
+		} else if (srcSends.size() > 1) {
+			ShareIntent.shareMultFile(context, "x-mixmedia/*", srcSends);
+		}
+		/*if (is_multi_choice) { // 若是在多选取状态下的话，则去除多选状态
+			is_multi_choice = !is_multi_choice;
+			multi_choice_process(is_multi_choice);
+		}
+		multi_path = new ArrayList<FileInfo>();*/
 	}
 }

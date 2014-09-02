@@ -11,6 +11,15 @@
         android:layout_height="match_parent" />
     <!-- The navigation drawer -->
 
+    <TextView
+        android:id="@+id/prompt_view"
+        android:layout_width="match_parent"
+        android:visibility="invisible"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:gravity="center_horizontal"
+        android:text="@string/the_folder_is_empty" />
+
     <ListView
         android:id="@+id/index_view"
         android:layout_width="240dp"
