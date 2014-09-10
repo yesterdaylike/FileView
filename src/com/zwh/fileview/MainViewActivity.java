@@ -1,15 +1,15 @@
 package com.zwh.fileview;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.text.CollationKey;
 import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import org.w3c.dom.Text;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
@@ -42,6 +42,7 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -242,6 +243,7 @@ public class MainViewActivity extends Activity {
 					FileOpertion.shareFiles(MainViewActivity.this, selected);
 					break;
 				case R.id.detail:
+					showDetailSelectedItems(selected);
 					break;
 
 				default:
@@ -338,6 +340,64 @@ public class MainViewActivity extends Activity {
 			}
 		})
 		.setNegativeButton(android.R.string.cancel, null).show();
+	}
+
+	private void showDetailSelectedItems(final File file){
+		ListView listView = new ListView(this);
+		ArrayList<HashMap<String, String>> dataArrayList = new ArrayList<HashMap<String, String>>();  
+
+		HashMap<String, String> map = new HashMap<String, String>();  
+		map.put("name", getString(R.string.path));
+		map.put("value", file.getPath());
+		dataArrayList.add(map);
+
+		map = new HashMap<String, String>();  
+		map.put("name", getString(R.string.lastModified));
+		long modify	= file.lastModified();
+		map.put("value", new Timestamp(modify).toString());
+		dataArrayList.add(map);
+
+		map = new HashMap<String, String>();  
+		map.put("name", getString(R.string.size));
+		long size	= FileOpertion.getFileSize(file);
+		map.put("value", FileOpertion.formetFileSize(size));
+		dataArrayList.add(map);
+
+		if(file.isDirectory()){
+			map = new HashMap<String, String>();  
+			map.put("name", getString(R.string.file_num));
+			map.put("value", String.valueOf(FileOpertion.getFileNumInDirectory(file)));
+			dataArrayList.add(map);
+		}
+
+		map = new HashMap<String, String>();  
+		map.put("name", getString(R.string.can_read));
+		map.put("value", file.canRead()? getString(R.string.yes):getString(R.string.no));
+		dataArrayList.add(map);
+
+		map = new HashMap<String, String>();  
+		map.put("name", getString(R.string.can_write));
+		map.put("value", file.canWrite()? getString(R.string.yes):getString(R.string.no));
+		dataArrayList.add(map);
+
+		map = new HashMap<String, String>();  
+		map.put("name", getString(R.string.can_execute));
+		map.put("value", file.canExecute()? getString(R.string.yes):getString(R.string.no));
+		dataArrayList.add(map);
+
+		SimpleAdapter mSchedule = new SimpleAdapter(this,
+				dataArrayList, 
+				R.layout.simple_list_item_2,
+				new String[] {"name", "value"},   
+				new int[] {R.id.text1, R.id.text2});
+		listView.setAdapter(mSchedule);
+
+
+		new AlertDialog.Builder(this)
+		.setTitle(file.getName())
+		.setIcon(FileOpertion.getDrawable(this, file))
+		.setView(listView).show();
+		//.setMessage(stringBuilder.toString()).show();
 	}
 	private void copyFile(File selected){
 		mClipboard = selected;

@@ -4,10 +4,11 @@
         android:id="@+id/add_folder"
         android:icon="@drawable/d_actionbar_icon_add_folder_enabled"
         android:showAsAction="always"
-        android:visible="false"
-        android:title="@string/add_floder"/>
+        android:title="@string/add_floder"
+        android:visible="false"/>
     <item
         android:id="@+id/search"
+        android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/d_actionbar_icon_search_enabled"
         android:showAsAction="always"
         android:title="@string/search"/>
@@ -15,7 +16,7 @@
         android:id="@+id/paste"
         android:icon="@drawable/d_actionbar_icon_paste_enabled"
         android:showAsAction="always"
-        android:visible="false"
-        android:title="@string/paste"/>
+        android:title="@string/paste"
+        android:visible="false"/>
 
 </menu>

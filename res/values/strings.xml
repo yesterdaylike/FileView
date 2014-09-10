@@ -24,6 +24,15 @@
     <string name="file_is_exist_already">A file already exists with this name.</string>
     <string name="rename_file_failed">Failed to rename file</string>
     <string name="send">Send</string>
+    <string name="can_read">can read</string>
+    <string name="can_write">can write</string>
+    <string name="can_execute">can execute</string>
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+    <string name="size">size</string>
+    <string name="path">path</string>
+    <string name="lastModified">last modified</string>
+    <string name="file_num">file num</string>
     <string name="no_apps_to_send">There is no application fits. </string>
     <string name="paste_file_failed">Failed to paste file</string>
     <string name="cut_file_failed">Failed to cut file</string>

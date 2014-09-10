@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -528,5 +529,49 @@ public class FileOpertion {
 			multi_choice_process(is_multi_choice);
 		}
 		multi_path = new ArrayList<FileInfo>();*/
+	}
+
+	public void Detail(Context context,File file){
+
+		getMIMEType(context, file);
+		file.getPath();
+
+		long size	= file.length();
+		formetFileSize(size);
+
+		long modify	= file.lastModified();
+		System.out.println(new Timestamp(modify).toString());
+
+	}
+
+	public static long getFileNumInDirectory(File file){
+		long size = 0;
+		File fileList[] = file.listFiles();
+		if(fileList!=null){
+			for (File fileTemp : fileList) {
+				if (fileTemp.isDirectory()) {
+					size += getFileNumInDirectory(fileTemp);
+				} else {
+					size++;
+				}
+			}
+		}
+		return size;
+	}
+
+	public static long getFileSize(File file){
+		long size = 0;
+		if(file.isFile()){
+			size = file.length();
+		}
+		else{
+			File fileList[] = file.listFiles();
+			if( fileList != null){
+				for (File fileTemp : fileList) {
+					size += getFileSize(fileTemp);
+				}
+			}
+		}
+		return size;
 	}
 }
