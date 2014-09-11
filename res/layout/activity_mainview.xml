@@ -17,8 +17,7 @@
         android:visibility="invisible"
         android:layout_height="wrap_content"
         android:layout_marginTop="?android:attr/expandableListPreferredItemPaddingLeft"
-        android:gravity="center_horizontal"
-        android:text="@string/the_folder_is_empty" />
+        android:gravity="center_horizontal"/>
 
     <ListView
         android:id="@+id/index_view"

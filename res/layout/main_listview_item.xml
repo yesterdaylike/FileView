@@ -1,7 +1,6 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal" >
+    android:layout_height="wrap_content" >
 
     <ImageView
         android:id="@+id/file_icon_iamgeview"
@@ -15,10 +14,24 @@
         android:id="@+id/file_name_textview"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
+        android:layout_toRightOf="@+id/file_icon_iamgeview"
         android:gravity="center_vertical"
         android:paddingStart="?android:attr/expandableListPreferredItemIndicatorLeft"
         android:textAlignment="viewStart"
         android:textAppearance="?android:attr/textAppearanceListItem" >
     </TextView>
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/file_path_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/file_icon_iamgeview"
+        android:gravity="center_vertical"
+        android:paddingStart="?android:attr/expandableListPreferredItemIndicatorLeft"
+        android:textAlignment="viewStart"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@android:color/darker_gray" >
+    </TextView>
+
+</RelativeLayout>

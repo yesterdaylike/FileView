@@ -39,6 +39,7 @@
     <string name="cut_file_to_clipboard">cut in clipboard</string>
     <string name="copy_file_to_clipboard">copy to clipboard</string>
     <string name="the_folder_is_empty">The folder is empty!</string>
+    <string name="search_nothing">search nothing</string>
 
     <string-array name="general_dir">
         <item>Home</item>

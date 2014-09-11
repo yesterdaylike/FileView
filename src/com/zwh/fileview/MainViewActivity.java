@@ -2,14 +2,10 @@ package com.zwh.fileview;
 
 import java.io.File;
 import java.sql.Timestamp;
-import java.text.CollationKey;
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
@@ -17,11 +13,13 @@ import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -42,6 +40,8 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +52,7 @@ public class MainViewActivity extends Activity {
 	private ListView mMainListView;
 	private ListView mIndexListView;
 	private TextView mPromptTextView;
+	private SearchView mSearchView;
 
 	private ListViewAdapter mMainListViewAdapter;
 	private Menu mOptionsMenu;
@@ -60,6 +61,7 @@ public class MainViewActivity extends Activity {
 	private File currentFile;
 	private File mClipboard;
 	private boolean mCut = false;
+	private boolean mIsSearch = false;
 
 	private String[] mIndexDirectory= {
 			File.listRoots()[0].getPath(),
@@ -128,7 +130,6 @@ public class MainViewActivity extends Activity {
 		if( null == name || name.isEmpty()){
 			name = "Home";
 		}
-
 		tab.setText(name);
 		//tab.setIcon(R.drawable.ic_launcher);
 		tab.setTag(tabDir);
@@ -143,7 +144,6 @@ public class MainViewActivity extends Activity {
 		@Override
 		public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
 			// TODO Auto-generated method stub
-
 		}
 
 		@Override
@@ -168,7 +168,10 @@ public class MainViewActivity extends Activity {
 		for (int i = bar.getTabCount() - 1; i > index; i--) {
 			bar.removeTabAt(i);
 		}
+		
+		Log.e(TAG, "tabSelected: "+currentFile.getPath());
 		if( null != mOptionsMenu ){
+			Log.v(TAG, "null, write: "+currentFile.canWrite());
 			mOptionsMenu.findItem(R.id.add_folder).setVisible(currentFile.canWrite());
 
 			if( currentFile.canWrite() && null != mClipboard){
@@ -265,7 +268,6 @@ public class MainViewActivity extends Activity {
 			public void onDestroyActionMode(ActionMode mode) {
 				// Here you can make any necessary updates to the activity when
 				// the CAB is removed. By default, selected items are deselected/unchecked.
-				Log.i(TAG, "onDestroyActionMode");
 				if( null != mOptionsMenu && currentFile.canWrite() && null != mClipboard){
 					mOptionsMenu.findItem(R.id.paste).setVisible(true);
 				}
@@ -287,7 +289,6 @@ public class MainViewActivity extends Activity {
 		.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
 			public void onClick(DialogInterface dialog, int whichButton) {
 				if(FileOpertion.DelFile(file)){
-					Log.i(TAG, "delete");
 					refreshList(currentFile.listFiles());
 				}
 				else{
@@ -401,7 +402,6 @@ public class MainViewActivity extends Activity {
 	}
 	private void copyFile(File selected){
 		mClipboard = selected;
-		Log.i(TAG, "onActionItemClicked copy");
 		Toast.makeText(MainViewActivity.this,
 				getString(R.string.copy_file_to_clipboard),
 				Toast.LENGTH_SHORT).show();
@@ -437,7 +437,6 @@ public class MainViewActivity extends Activity {
 		Toast.makeText(MainViewActivity.this,
 				getString(R.string.cut_file_to_clipboard),
 				Toast.LENGTH_SHORT).show();
-		Log.i(TAG, "onActionItemClicked cut");
 	}
 
 	private void pasteCutFile(){
@@ -470,10 +469,16 @@ public class MainViewActivity extends Activity {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			File currentFile = mMainListViewAdapter.getItem(position);
 			Log.i("MainListOnItemClickListener", "position:"+position+",currentFile:"+currentFile.getName());
-			Log.v("v","isDirectory: "+ currentFile.isDirectory() );
 			if( currentFile.isDirectory() ){
-				//refreshList(currentFile.listFiles());
-				addTab(currentFile);
+				if(mIsSearch){
+					refrestTab(currentFile.getPath());
+					mIsSearch = false;
+					mSearchView.setIconified(true);
+					mSearchView.setIconified(true);
+				}
+				else{
+					addTab(currentFile);
+				}
 			}
 			else{
 				FileOpertion.openFile(MainViewActivity.this, currentFile);
@@ -510,7 +515,7 @@ public class MainViewActivity extends Activity {
 
 		public void setFileData(File[] dataList){
 			if( null != dataList ){
-				Arrays.sort(dataList, fileComparator);
+				Arrays.sort(dataList, FileOpertion.fileComparator);
 			}
 
 			this.fileList = dataList;
@@ -542,6 +547,7 @@ public class MainViewActivity extends Activity {
 				convertView = LayoutInflater.from(mContext).inflate(  
 						R.layout.main_listview_item, null);
 				holder.fileNameTextView = (TextView) convertView.findViewById(R.id.file_name_textview);  
+				holder.filePathTextView = (TextView) convertView.findViewById(R.id.file_path_textview);  
 				holder.fileIconImageView = (ImageView) convertView.findViewById(R.id.file_icon_iamgeview);  
 
 				convertView.setTag(holder);
@@ -550,9 +556,15 @@ public class MainViewActivity extends Activity {
 			}  
 
 			holder.fileNameTextView.setText(fileList[position].getName());
+
+			if (mIsSearch) {
+				holder.filePathTextView.setText(fileList[position].getParent());
+			}
+			else{
+				holder.filePathTextView.setText(null);
+			}
+
 			Drawable drawableLeft = FileOpertion.getDrawable(mContext, fileList[position]);
-			//drawableLeft.setBounds(1, 1, 50, 1);
-			//holder.fileNameTextView.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, null, null, null);
 			holder.fileIconImageView.setImageDrawable(drawableLeft);
 			return convertView;
 		}  
@@ -562,6 +574,7 @@ public class MainViewActivity extends Activity {
 		 */  
 		final class ViewHolder {  
 			TextView fileNameTextView;
+			TextView filePathTextView;
 			ImageView fileIconImageView;
 		}
 	}  
@@ -571,6 +584,33 @@ public class MainViewActivity extends Activity {
 		MenuInflater inflater = getMenuInflater();  
 		inflater.inflate(R.menu.action, menu);
 		mOptionsMenu = menu;
+		mOptionsMenu.findItem(R.id.add_folder).setVisible(currentFile.canWrite());
+		
+		mSearchView = (SearchView) menu.findItem(R.id.search).getActionView();
+
+		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+		if(null!=searchManager ) {   
+			//mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+		}
+		//mSearchView.setIconifiedByDefault(false);
+		//mSearchView.setSubmitButtonEnabled(true);
+		mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
+
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				// TODO Auto-generated method stub
+				Log.i(TAG, query);
+				mIsSearch = true;
+				new SearchTask().execute(query);
+				return false;
+			}
+
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+		});
 		return true;
 	}  
 
@@ -609,9 +649,9 @@ public class MainViewActivity extends Activity {
 		case R.id.add_folder:
 			makeNewDirDialog();
 			break;
-		case R.id.search:
-
-			break;
+			/*case R.id.search:
+			//zhengwenhui
+			break;*/
 		case R.id.paste:
 			if(mCut){
 				pasteCutFile();
@@ -652,9 +692,6 @@ public class MainViewActivity extends Activity {
 	}
 
 	private void mkdirs(String fileName){
-		/*ActionBar bar = getActionBar();
-		Tab tab = bar.getTabAt( bar.getTabCount() - 1 );
-		final File currentFile = (File) tab.getTag();*/
 		final String path = currentFile.getPath();
 		String filePath;
 		if(path.equals(File.separator)){
@@ -672,7 +709,6 @@ public class MainViewActivity extends Activity {
 			if(created){
 				refreshList(currentFile.listFiles());
 			}
-			Log.e("path", filePath+","+created);
 		}
 		else{
 			Toast.makeText(MainViewActivity.this,
@@ -683,8 +719,12 @@ public class MainViewActivity extends Activity {
 
 	private void refreshList(File[] dataList){
 		if( null == dataList || dataList.length < 1){
-			Log.e(TAG, "wow this floder is empty!");
 			mPromptTextView.setVisibility(View.VISIBLE);
+			int resid = R.string.the_folder_is_empty;
+			if(mIsSearch){
+				resid = R.string.search_nothing;
+			}
+			mPromptTextView.setText(resid);
 		}
 		else if(mPromptTextView.getVisibility()==View.VISIBLE){
 			mPromptTextView.setVisibility(View.INVISIBLE);
@@ -694,49 +734,6 @@ public class MainViewActivity extends Activity {
 		mMainListView.invalidate();
 	}
 
-	private Comparator<File> fileComparator = new Comparator<File>() {
-
-		private Collator collator = Collator.getInstance(); //调入这个是解决中文排序问题 
-		private Map<File, CollationKey> map = new HashMap<File, CollationKey>();
-		private CollationKey lkey; 
-		private CollationKey rkey; 
-		private String label;
-		private Object object;
-		@Override
-		public int compare(File lhs, File rhs) {
-			// TODO Auto-generated method stub
-
-			object = map.get(lhs);
-			if( null != object ){
-				lkey = (CollationKey) object;
-			}
-			else{
-				label = lhs.getName();
-				lkey = collator.getCollationKey(label.toLowerCase(Locale.CHINESE));
-				map.put(lhs, lkey);
-			}
-
-			object = map.get(rhs);
-			if( null != object ){
-				rkey = (CollationKey) object;
-			}
-			else{
-				label = rhs.getName();
-				rkey = collator.getCollationKey(label.toLowerCase(Locale.CHINESE));
-				map.put(rhs, rkey);
-			}
-
-			if(rhs.isDirectory() && !lhs.isDirectory()){
-				return 1;
-			}
-
-			if(!rhs.isDirectory() && lhs.isDirectory()){
-				return -1;
-			}
-
-			return lkey.compareTo(rkey);
-		}
-	};
 
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
 		@Override
@@ -752,5 +749,60 @@ public class MainViewActivity extends Activity {
 		String path = intent.getStringExtra(FileOpertion.SHORTCUT_PATH);
 		refrestTab(path);
 		super.onNewIntent(intent);
+	}
+
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+
+		if(mIsSearch){
+			mIsSearch = false;
+			refreshList(currentFile.listFiles());
+			mSearchView.setIconified(true);
+			mSearchView.setIconified(true);
+			return;
+		}
+
+		if(!mSearchView.isIconified()){
+			mSearchView.setIconified(true);
+			mSearchView.setIconified(true);
+			return;
+		}
+
+		ActionBar bar = getActionBar();
+		int index = bar.getTabCount();
+		if(index >= 2){
+			Tab tab = bar.getTabAt( index - 2 );
+			bar.selectTab(tab);
+		}
+
+		else{
+			super.onBackPressed();
+		}
+	}
+
+	class SearchTask extends AsyncTask<String, Void, Boolean> {
+		private File[] searchList;
+		private String curFile;
+		
+		@Override  
+		protected Boolean doInBackground(String... params) {
+			curFile = currentFile.getPath();
+			
+			String query = params[0];
+			List<File> resultFile = new ArrayList<File>();
+			FileOpertion.searchFile(resultFile, currentFile, query);
+
+			int size = resultFile.size();
+			searchList = resultFile.toArray(new File[size]);
+			return true;
+		}  
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if( !mSearchView.isIconified() && curFile.equals(currentFile.getPath())){
+				refreshList( searchList );
+			}
+		}  
 	}
 }

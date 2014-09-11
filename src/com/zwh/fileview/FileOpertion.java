@@ -9,8 +9,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
+import java.text.CollationKey;
+import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -574,4 +581,85 @@ public class FileOpertion {
 		}
 		return size;
 	}
+	
+	private List<String> lstFile =new ArrayList<String>(); //结果 List
+	 
+	public void GetFiles(String Path, String Extension) 
+	{
+	    File[] files =new File(Path).listFiles();
+	 
+	    for (int i =0; i < files.length; i++)
+	    {
+	        File f = files[i];
+	        if (f.isFile())
+	        {
+	            if (f.getPath().substring(f.getPath().length() - Extension.length()).equals(Extension)) //判断扩展名
+	                lstFile.add(f.getPath());
+	        }
+	        else if (f.isDirectory() && f.getPath().indexOf("/.") == -1) //忽略点文件（隐藏文件/文件夹）
+	            GetFiles(f.getPath(), Extension);
+	    }
+	}
+	
+	public static void searchFile(List<File> resultFile, File file, String str){
+		File[] fileList = file.listFiles();
+		if( fileList == null ){
+			return;
+		}
+		
+		for (File fileTemp : fileList) {
+			if(fileTemp.getName().toLowerCase().indexOf(str) != -1){
+				resultFile.add(fileTemp);
+			}
+			
+			if(fileTemp.isDirectory()){
+				searchFile(resultFile, fileTemp, str);
+			}
+		}
+	}
+	
+
+	public static Comparator<File> fileComparator = new Comparator<File>() {
+
+		private Collator collator = Collator.getInstance(); //调入这个是解决中文排序问题 
+		private Map<File, CollationKey> map = new HashMap<File, CollationKey>();
+		private CollationKey lkey; 
+		private CollationKey rkey; 
+		private String label;
+		private Object object;
+		@Override
+		public int compare(File lhs, File rhs) {
+			// TODO Auto-generated method stub
+
+			object = map.get(lhs);
+			if( null != object ){
+				lkey = (CollationKey) object;
+			}
+			else{
+				label = lhs.getName();
+				lkey = collator.getCollationKey(label.toLowerCase(Locale.CHINESE));
+				map.put(lhs, lkey);
+			}
+
+			object = map.get(rhs);
+			if( null != object ){
+				rkey = (CollationKey) object;
+			}
+			else{
+				label = rhs.getName();
+				rkey = collator.getCollationKey(label.toLowerCase(Locale.CHINESE));
+				map.put(rhs, rkey);
+			}
+
+			if(rhs.isDirectory() && !lhs.isDirectory()){
+				return 1;
+			}
+
+			if(!rhs.isDirectory() && lhs.isDirectory()){
+				return -1;
+			}
+
+			return lkey.compareTo(rkey);
+		}
+	};
 }
