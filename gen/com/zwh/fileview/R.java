@@ -66,30 +66,32 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int ic_launcher=0x7f020020;
     }
     public static final class id {
-        public static final int add_folder=0x7f090009;
-        public static final int copy=0x7f09000c;
-        public static final int cut=0x7f09000e;
-        public static final int delete=0x7f09000d;
-        public static final int detail=0x7f090012;
+        public static final int add_folder=0x7f09000a;
+        public static final int copy=0x7f09000d;
+        public static final int cut=0x7f09000f;
+        public static final int delete=0x7f09000e;
+        public static final int detail=0x7f090013;
         public static final int drawer_layout=0x7f090000;
         public static final int file_icon_iamgeview=0x7f090004;
         public static final int file_name_textview=0x7f090005;
         public static final int file_path_textview=0x7f090006;
         public static final int index_view=0x7f090003;
         public static final int main_view=0x7f090001;
-        public static final int paste=0x7f09000b;
+        public static final int paste=0x7f09000c;
         public static final int prompt_view=0x7f090002;
-        public static final int rename=0x7f09000f;
-        public static final int search=0x7f09000a;
-        public static final int share=0x7f090010;
-        public static final int shortcut=0x7f090011;
-        public static final int text1=0x7f090007;
-        public static final int text2=0x7f090008;
+        public static final int rename=0x7f090010;
+        public static final int search=0x7f09000b;
+        public static final int selectedAll=0x7f090007;
+        public static final int share=0x7f090011;
+        public static final int shortcut=0x7f090012;
+        public static final int text1=0x7f090008;
+        public static final int text2=0x7f090009;
     }
     public static final class layout {
         public static final int activity_mainview=0x7f030000;
         public static final int main_listview_item=0x7f030001;
-        public static final int simple_list_item_2=0x7f030002;
+        public static final int mulchoice_spinner=0x7f030002;
+        public static final int simple_list_item_2=0x7f030003;
     }
     public static final class menu {
         public static final int action=0x7f080000;
@@ -98,43 +100,46 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
     public static final class string {
         public static final int add_floder=0x7f06000c;
         public static final int app_name=0x7f060000;
-        public static final int can_execute=0x7f060019;
-        public static final int can_read=0x7f060017;
-        public static final int can_write=0x7f060018;
+        public static final int can_execute=0x7f06001b;
+        public static final int can_read=0x7f060019;
+        public static final int can_write=0x7f06001a;
         public static final int copy=0x7f060003;
-        public static final int copy_file_to_clipboard=0x7f060024;
+        public static final int copy_file_to_clipboard=0x7f060026;
         public static final int cut=0x7f060005;
-        public static final int cut_file_failed=0x7f060022;
-        public static final int cut_file_to_clipboard=0x7f060023;
+        public static final int cut_file_failed=0x7f060024;
+        public static final int cut_file_to_clipboard=0x7f060025;
         public static final int delete=0x7f060004;
         public static final int delete_file_failed=0x7f060012;
         public static final int detail=0x7f06000a;
         public static final int directory_is_exist_already=0x7f06000f;
         public static final int drawer_close=0x7f060001;
         public static final int drawer_open=0x7f060002;
-        public static final int file_is_exist_already=0x7f060014;
-        public static final int file_num=0x7f06001f;
-        public static final int lastModified=0x7f06001e;
-        public static final int no=0x7f06001b;
-        public static final int no_apps_to_send=0x7f060020;
+        public static final int file_is_exist_already=0x7f060016;
+        public static final int file_num=0x7f060021;
+        public static final int lastModified=0x7f060020;
+        public static final int no=0x7f06001d;
+        public static final int no_apps_to_send=0x7f060022;
         public static final int paste=0x7f060006;
-        public static final int paste_file_failed=0x7f060021;
-        public static final int path=0x7f06001d;
+        public static final int paste_file_failed=0x7f060023;
+        public static final int path=0x7f06001f;
         public static final int rename=0x7f060007;
-        public static final int rename_file_failed=0x7f060015;
+        public static final int rename_file_failed=0x7f060017;
         public static final int search=0x7f06000b;
-        public static final int search_nothing=0x7f060026;
-        public static final int send=0x7f060016;
+        public static final int search_nothing=0x7f060028;
+        public static final int selected=0x7f060029;
+        public static final int send=0x7f060018;
         public static final int share=0x7f060008;
         public static final int shortcut=0x7f060009;
-        public static final int size=0x7f06001c;
+        public static final int size=0x7f06001e;
         public static final int str_mkdir=0x7f06000d;
         public static final int str_newdir_text=0x7f060010;
         public static final int str_rename_text=0x7f060011;
         public static final int sure_delete_file=0x7f060013;
-        public static final int the_folder_is_empty=0x7f060025;
+        public static final int sure_delete_file_2=0x7f060014;
+        public static final int sure_delete_file_2_end=0x7f060015;
+        public static final int the_folder_is_empty=0x7f060027;
         public static final int wrong_file_name=0x7f06000e;
-        public static final int yes=0x7f06001a;
+        public static final int yes=0x7f06001c;
     }
     public static final class styleable {
         /** 

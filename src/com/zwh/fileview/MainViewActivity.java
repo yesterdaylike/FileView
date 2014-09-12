@@ -3,7 +3,6 @@ package com.zwh.fileview;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,7 +17,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,14 +29,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
@@ -46,7 +43,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainViewActivity extends Activity {
+public class MainViewActivity extends Activity{
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private ListView mMainListView;
@@ -59,7 +56,8 @@ public class MainViewActivity extends Activity {
 
 	private static String TAG = "FileView";
 	private File currentFile;
-	private File mClipboard;
+	//private File mClipboard;
+	private File[] mClipboard;
 	private boolean mCut = false;
 	private boolean mIsSearch = false;
 
@@ -80,7 +78,7 @@ public class MainViewActivity extends Activity {
 		mMainListViewAdapter = new ListViewAdapter(this, File.listRoots()[0].listFiles());
 		mMainListView.setAdapter(mMainListViewAdapter);
 		mMainListView.setOnItemClickListener(new MainListOnItemClickListener());
-		mMainListView.setOnItemLongClickListener(new MainListOnItemLongClickListener());
+		//mMainListView.setOnItemLongClickListener(new MainListOnItemLongClickListener());
 
 
 		mIndexListView = (ListView) findViewById(R.id.index_view);
@@ -168,7 +166,7 @@ public class MainViewActivity extends Activity {
 		for (int i = bar.getTabCount() - 1; i > index; i--) {
 			bar.removeTabAt(i);
 		}
-		
+
 		Log.e(TAG, "tabSelected: "+currentFile.getPath());
 		if( null != mOptionsMenu ){
 			Log.v(TAG, "null, write: "+currentFile.canWrite());
@@ -209,44 +207,51 @@ public class MainViewActivity extends Activity {
 	private void setContextualAction(){
 		mMainListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		mMainListView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
-			private File selected;
+			//private File selected;
+			private CheckBox selectAllCheckBox;
+			private MenuItem mRenameMenuItem;
+			private MenuItem mShortCutsMenuItem;
 			@Override
 			public void onItemCheckedStateChanged(ActionMode mode, int position,
 					long id, boolean checked) {
 				// Here you can do something when items are selected/de-selected,
 				// such as update the title in the CAB
-				//mMainListView.setItemChecked(position, checked);
-				Log.i(TAG, "onItemCheckedStateChanged position:"+ position+ ",id:"+id+",checked:"+checked);
-				//View itemView = mMainListView.getChildAt(position);
-				//itemView.setBackgroundResource(android.R.color.white);
+				Log.i(TAG, new Exception().getStackTrace()[1].getMethodName());
+				//Log.i(TAG, "onItemCheckedStateChanged position:"+ position+ ",id:"+id+",checked:"+checked);
 
-				selected = (File) mMainListView.getItemAtPosition(position);
+				mMainListViewAdapter.setItemChecked(position, checked);
+				mMainListViewAdapter.notifyDataSetChanged();
+				//selected = (File) mMainListView.getItemAtPosition(position);
+				showSelected();
 			}
 
 			@Override
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 				// Respond to clicks on the actions in the CAB
+				Log.i(TAG, new Exception().getStackTrace()[1].getMethodName());
+				List<File> checkedFileList = mMainListViewAdapter.getCheckedFile();
+
 				switch (item.getItemId()) {
 				case R.id.copy:
-					copyFile(selected);
+					copyFile(checkedFileList);
 					break;
 				case R.id.cut:
-					cutFile(selected);
+					cutFile(checkedFileList);
 					break;
 				case R.id.delete:
-					deleteSelectedItems(selected);
+					deleteSelectedItems(checkedFileList);
 					break;
 				case R.id.rename:
-					renameSelectedItems(selected);
+					renameSelectedItems(checkedFileList.get(0));
 					break;
 				case R.id.shortcut:
-					FileOpertion.addShortcut(MainViewActivity.this, selected);
+					FileOpertion.addShortcut(MainViewActivity.this, checkedFileList.get(0));
 					break;
 				case R.id.share:
-					FileOpertion.shareFiles(MainViewActivity.this, selected);
+					//FileOpertion.shareFiles(MainViewActivity.this, selected);
 					break;
 				case R.id.detail:
-					showDetailSelectedItems(selected);
+					//showDetailSelectedItems(selected);
 					break;
 
 				default:
@@ -259,8 +264,36 @@ public class MainViewActivity extends Activity {
 			@Override
 			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 				// Inflate the menu for the CAB
+				Log.i(TAG, new Exception().getStackTrace()[1].getMethodName());
 				MenuInflater inflater = mode.getMenuInflater();
 				inflater.inflate(R.menu.contextual_action, menu);
+				mRenameMenuItem = menu.findItem(R.id.rename);
+				mShortCutsMenuItem = menu.findItem(R.id.shortcut);
+
+				View MulView = LayoutInflater.from(MainViewActivity.this)
+						.inflate(R.layout.mulchoice_spinner, null);
+				mode.setCustomView(MulView);
+
+				selectAllCheckBox = (CheckBox)MulView.findViewById(R.id.selectedAll);
+				/*selectAllCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+						// TODO Auto-generated method stub
+						if (isChecked) {
+							mMainListViewAdapter.checkAll();
+							for(int i = 0;i<mMainListViewAdapter.getCount();i++){
+								mMainListView.setSelection(i);
+							}
+						} else {
+							mMainListViewAdapter.uncheckAll();
+							//mMainListView.clearChoices();
+						}
+						mMainListViewAdapter.notifyDataSetChanged();
+						showSelected();
+					}
+				});*/
+				mMainListViewAdapter.setActionModeState(true);
+				showSelected();
 				return true;
 			}
 
@@ -268,34 +301,74 @@ public class MainViewActivity extends Activity {
 			public void onDestroyActionMode(ActionMode mode) {
 				// Here you can make any necessary updates to the activity when
 				// the CAB is removed. By default, selected items are deselected/unchecked.
+				Log.i(TAG, new Exception().getStackTrace()[1].getMethodName());
 				if( null != mOptionsMenu && currentFile.canWrite() && null != mClipboard){
 					mOptionsMenu.findItem(R.id.paste).setVisible(true);
 				}
+
+				mMainListViewAdapter.setActionModeState(false);
 			}
 
 			@Override
 			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 				// Here you can perform updates to the CAB due to
 				// an invalidate() request
+				Log.i(TAG, new Exception().getStackTrace()[1].getMethodName());
 				return false;
+			}
+
+			private String showSelected(){
+				StringBuilder strBuilder = new StringBuilder();
+				strBuilder.append(mMainListViewAdapter.getCheckedItemCount());
+				strBuilder.append(File.separator);
+				strBuilder.append(mMainListViewAdapter.getCount());
+				strBuilder.append(" ");
+				strBuilder.append(getString(R.string.selected));
+
+				Log.e(TAG, strBuilder.toString());
+
+				selectAllCheckBox.setText(strBuilder.toString());
+
+				boolean mul = mMainListViewAdapter.getCheckedItemCount() > 1;
+				mRenameMenuItem.setVisible( !mul );
+				mShortCutsMenuItem.setVisible( !mul );
+
+				return null;
 			}
 		});
 	}
 
-	private void deleteSelectedItems(final File file){
+	private void deleteSelectedItems(final List<File> checkedFileList){
+		final StringBuilder stringBuilder = new StringBuilder();
+		
+		for (File file : checkedFileList) {
+			stringBuilder.append(file.getName());
+			stringBuilder.append(System.lineSeparator());
+		}
+		
+		String message = stringBuilder.toString();
+		
+		stringBuilder.delete(0, stringBuilder.length());
+		
+		String tile = getString(R.string.sure_delete_file);
+		
+		int size = checkedFileList.size();
+		if( size > 4 ){
+			stringBuilder.append(getString(R.string.sure_delete_file_2));
+			stringBuilder.append(System.lineSeparator());
+			stringBuilder.append(String.valueOf(size));
+			stringBuilder.append(System.lineSeparator());
+			stringBuilder.append(getString(R.string.sure_delete_file_2_end));
+			tile = stringBuilder.toString();
+		}
+
 		new AlertDialog.Builder(this)
-		.setTitle(R.string.sure_delete_file)
-		//.setMessage(R.string.sure_delete_file)
+		.setTitle(tile)
+		.setMessage(message)
 		.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
 			public void onClick(DialogInterface dialog, int whichButton) {
-				if(FileOpertion.DelFile(file)){
-					refreshList(currentFile.listFiles());
-				}
-				else{
-					Toast.makeText(MainViewActivity.this,
-							getString(R.string.delete_file_failed),
-							Toast.LENGTH_SHORT).show();
-				}
+				DeleteTask deleteTask = new DeleteTask(checkedFileList);
+				deleteTask.execute();
 			}
 		})
 		.setNegativeButton(android.R.string.cancel, null).show();
@@ -400,39 +473,28 @@ public class MainViewActivity extends Activity {
 		.setView(listView).show();
 		//.setMessage(stringBuilder.toString()).show();
 	}
-	private void copyFile(File selected){
+	
+	/*private void copyFile(File selected){
 		mClipboard = selected;
+		Toast.makeText(MainViewActivity.this,
+				getString(R.string.copy_file_to_clipboard),
+				Toast.LENGTH_SHORT).show();
+	}*/
+	
+	private void copyFile(List<File> fileList){
+		mClipboard = fileList.toArray(new File[fileList.size()]);
+		
 		Toast.makeText(MainViewActivity.this,
 				getString(R.string.copy_file_to_clipboard),
 				Toast.LENGTH_SHORT).show();
 	}
 
 	private void pasteCopyFile(){
-		File targetFile = new File(currentFile, mClipboard.getName());
-		int ret = FileOpertion.copyFile(mClipboard, targetFile);
-
-		switch (ret) {
-		case FileOpertion.SUCCESS:
-			refreshList(currentFile.listFiles());
-			break;
-		case FileOpertion.FILE_IS_ALREADY_EXITS:
-			Toast.makeText(MainViewActivity.this,
-					getString(R.string.file_is_exist_already),
-					Toast.LENGTH_SHORT).show();
-			break;
-		case FileOpertion.FAILED:
-			Toast.makeText(MainViewActivity.this,
-					getString(R.string.paste_file_failed),
-					Toast.LENGTH_SHORT).show();
-			break;
-
-		default:
-			break;
-		}
+		new PasteCopyTask().execute();
 	}
 
-	private void cutFile(File selected){
-		mClipboard = selected;
+	private void cutFile(List<File> fileList){
+		mClipboard = fileList.toArray(new File[fileList.size()]);
 		mCut = true;
 		Toast.makeText(MainViewActivity.this,
 				getString(R.string.cut_file_to_clipboard),
@@ -440,28 +502,33 @@ public class MainViewActivity extends Activity {
 	}
 
 	private void pasteCutFile(){
-		int ret = FileOpertion.cutPasteFile(mClipboard, currentFile);
+		int ret;
+		
+		for (File cutFile : mClipboard) {
+			ret = FileOpertion.cutPasteFile(cutFile, currentFile);
+			switch (ret) {
+			case FileOpertion.SUCCESS:
+				refreshList(currentFile.listFiles());
+				cutFile = null;
+				break;
+			case FileOpertion.FILE_IS_ALREADY_EXITS:
+				Toast.makeText(MainViewActivity.this,
+						getString(R.string.file_is_exist_already),
+						Toast.LENGTH_SHORT).show();
+				break;
+			case FileOpertion.FAILED:
+				Toast.makeText(MainViewActivity.this,
+						getString(R.string.cut_file_failed),
+						Toast.LENGTH_SHORT).show();
+				break;
 
-		switch (ret) {
-		case FileOpertion.SUCCESS:
-			refreshList(currentFile.listFiles());
-			mCut = false;
-			mClipboard = null;
-			break;
-		case FileOpertion.FILE_IS_ALREADY_EXITS:
-			Toast.makeText(MainViewActivity.this,
-					getString(R.string.file_is_exist_already),
-					Toast.LENGTH_SHORT).show();
-			break;
-		case FileOpertion.FAILED:
-			Toast.makeText(MainViewActivity.this,
-					getString(R.string.cut_file_failed),
-					Toast.LENGTH_SHORT).show();
-			break;
-
-		default:
-			break;
+			default:
+				break;
+			}
 		}
+		
+		mClipboard = null;
+		mCut = false;
 	}
 
 	private class MainListOnItemClickListener implements ListView.OnItemClickListener {
@@ -473,6 +540,7 @@ public class MainViewActivity extends Activity {
 				if(mIsSearch){
 					refrestTab(currentFile.getPath());
 					mIsSearch = false;
+					mMainListViewAdapter.setSearchState(mIsSearch);
 					mSearchView.setIconified(true);
 					mSearchView.setIconified(true);
 				}
@@ -486,98 +554,23 @@ public class MainViewActivity extends Activity {
 		}
 	}
 
-	private class MainListOnItemLongClickListener implements OnItemLongClickListener{
+	/*private class MainListOnItemLongClickListener implements OnItemLongClickListener{
 
 		@Override
 		public boolean onItemLongClick(AdapterView<?> parent, View view,
 				int position, long id) {
 			// TODO Auto-generated method stub
 			//view.setBackgroundResource(android.R.color.black);
-			/*if (mActionMode != null) {
+			if (mActionMode != null) {
 				return false;
 			}
 
 			// Start the CAB using the ActionMode.Callback defined above
 			mActionMode = startActionMode(mActionModeCallback);
-			view.setSelected(true);*/
+			view.setSelected(true);
 			return false;
 		}
-	}
-
-	public class ListViewAdapter extends BaseAdapter {
-		private Context mContext;
-		private File[] fileList;
-
-		public ListViewAdapter(Context context, File[] dataList) {  
-			this.mContext = context;  
-			setFileData(dataList);
-		}  
-
-		public void setFileData(File[] dataList){
-			if( null != dataList ){
-				Arrays.sort(dataList, FileOpertion.fileComparator);
-			}
-
-			this.fileList = dataList;
-		}
-
-		@Override  
-		public int getCount() {
-			if( null == fileList ){
-				return 0;
-			}
-			return fileList.length; 
-		}  
-
-		@Override  
-		public File getItem(int position) {  
-			return fileList[position];
-		}  
-
-		@Override  
-		public long getItemId(int position) {  
-			return position;
-		}  
-
-		@Override  
-		public View getView(int position, View convertView, ViewGroup parent) {
-			ViewHolder holder = null;  
-			if (convertView == null) {  
-				holder = new ViewHolder();  
-				convertView = LayoutInflater.from(mContext).inflate(  
-						R.layout.main_listview_item, null);
-				holder.fileNameTextView = (TextView) convertView.findViewById(R.id.file_name_textview);  
-				holder.filePathTextView = (TextView) convertView.findViewById(R.id.file_path_textview);  
-				holder.fileIconImageView = (ImageView) convertView.findViewById(R.id.file_icon_iamgeview);  
-
-				convertView.setTag(holder);
-			} else {  
-				holder = (ViewHolder) convertView.getTag();
-			}  
-
-			holder.fileNameTextView.setText(fileList[position].getName());
-
-			if (mIsSearch) {
-				holder.filePathTextView.setText(fileList[position].getParent());
-			}
-			else{
-				holder.filePathTextView.setText(null);
-			}
-
-			Drawable drawableLeft = FileOpertion.getDrawable(mContext, fileList[position]);
-			holder.fileIconImageView.setImageDrawable(drawableLeft);
-			return convertView;
-		}  
-
-		/** 
-		 * ViewHolder类用以储存item中控件的引用 
-		 */  
-		final class ViewHolder {  
-			TextView fileNameTextView;
-			TextView filePathTextView;
-			ImageView fileIconImageView;
-		}
-	}  
+	}*/
 
 	@Override  
 	public boolean onCreateOptionsMenu(Menu menu){  
@@ -585,7 +578,7 @@ public class MainViewActivity extends Activity {
 		inflater.inflate(R.menu.action, menu);
 		mOptionsMenu = menu;
 		mOptionsMenu.findItem(R.id.add_folder).setVisible(currentFile.canWrite());
-		
+
 		mSearchView = (SearchView) menu.findItem(R.id.search).getActionView();
 
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -601,6 +594,7 @@ public class MainViewActivity extends Activity {
 				// TODO Auto-generated method stub
 				Log.i(TAG, query);
 				mIsSearch = true;
+				mMainListViewAdapter.setSearchState(mIsSearch);
 				new SearchTask().execute(query);
 				return false;
 			}
@@ -757,6 +751,7 @@ public class MainViewActivity extends Activity {
 
 		if(mIsSearch){
 			mIsSearch = false;
+			mMainListViewAdapter.setSearchState(mIsSearch);
 			refreshList(currentFile.listFiles());
 			mSearchView.setIconified(true);
 			mSearchView.setIconified(true);
@@ -784,11 +779,11 @@ public class MainViewActivity extends Activity {
 	class SearchTask extends AsyncTask<String, Void, Boolean> {
 		private File[] searchList;
 		private String curFile;
-		
+
 		@Override  
 		protected Boolean doInBackground(String... params) {
 			curFile = currentFile.getPath();
-			
+
 			String query = params[0];
 			List<File> resultFile = new ArrayList<File>();
 			FileOpertion.searchFile(resultFile, currentFile, query);
@@ -803,6 +798,112 @@ public class MainViewActivity extends Activity {
 			if( !mSearchView.isIconified() && curFile.equals(currentFile.getPath())){
 				refreshList( searchList );
 			}
+		}  
+	}
+	
+	class DeleteTask extends AsyncTask<String, Boolean, Boolean> {
+		private List<File> fileList;
+		private StringBuilder stringBuilder;
+		private String fileName;
+		
+		DeleteTask(List<File> checkedFileList){
+			fileList = checkedFileList;
+			stringBuilder = new StringBuilder();
+		}
+
+		@Override  
+		protected Boolean doInBackground(String... params) {
+			for (File file : fileList) {
+				boolean del = FileOpertion.DelFile(file);
+				fileName = file.getName();
+				publishProgress(del);
+			}
+			return true;
+		}
+
+		@Override
+		protected void onProgressUpdate(Boolean... values) {
+			// TODO Auto-generated method stub
+			if(values[0]){
+				refreshList(currentFile.listFiles());
+			}
+			else{
+				stringBuilder.delete(0, stringBuilder.length());
+				stringBuilder.append(getString(R.string.delete_file_failed));
+				stringBuilder.append(" ");
+				stringBuilder.append(fileName);
+				
+				Toast.makeText(MainViewActivity.this,
+						stringBuilder.toString(),
+						Toast.LENGTH_SHORT).show();
+			}
+			super.onProgressUpdate(values);
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			//refreshList(currentFile.listFiles());
+		}  
+	}
+	
+	class PasteCopyTask extends AsyncTask<String, Integer, Boolean> {
+		private StringBuilder stringBuilder;
+		private String fileName;
+		
+		PasteCopyTask(){
+			stringBuilder = new StringBuilder();
+		}
+		
+		@Override  
+		protected Boolean doInBackground(String... params) {
+			for (File file : mClipboard) {
+				File targetFile = new File(currentFile, file.getName());
+				
+				int ret = FileOpertion.copyFile(file, targetFile);
+				fileName = file.getName();
+				publishProgress(ret);
+			}
+			
+			return true;
+		}
+		
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+			// TODO Auto-generated method stub
+			switch (values[0]) {
+			case FileOpertion.SUCCESS:
+				refreshList(currentFile.listFiles());
+				break;
+			case FileOpertion.FILE_IS_ALREADY_EXITS:
+				stringBuilder.delete(0, stringBuilder.length());
+				stringBuilder.append(fileName);
+				stringBuilder.append(" ");
+				stringBuilder.append(getString(R.string.file_is_exist_already));
+				
+				Toast.makeText(MainViewActivity.this,
+						stringBuilder.toString(),
+						Toast.LENGTH_SHORT).show();
+				break;
+			case FileOpertion.FAILED:
+				stringBuilder.delete(0, stringBuilder.length());
+				stringBuilder.append(fileName);
+				stringBuilder.append(" ");
+				stringBuilder.append(getString(R.string.paste_file_failed));
+				
+				Toast.makeText(MainViewActivity.this,
+						stringBuilder.toString(),
+						Toast.LENGTH_SHORT).show();
+				break;
+
+			default:
+				break;
+			}
+			super.onProgressUpdate(values);
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			//refreshList(currentFile.listFiles());
 		}  
 	}
 }

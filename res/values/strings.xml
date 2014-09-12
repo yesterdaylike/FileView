@@ -19,8 +19,10 @@
     <string name="directory_is_exist_already">A directory already exists with this name.</string>
     <string name="str_newdir_text">Please input the folder name :</string>
     <string name="str_rename_text">Please input new name :</string>
-    <string name="delete_file_failed">Failed to delete file</string>
-    <string name="sure_delete_file">Sure to delete</string>
+    <string name="delete_file_failed">Failed to delete </string>
+    <string name="sure_delete_file">Sure to delete ?</string>
+    <string name="sure_delete_file_2">Sure to delete</string>
+    <string name="sure_delete_file_2_end">files ? </string>
     <string name="file_is_exist_already">A file already exists with this name.</string>
     <string name="rename_file_failed">Failed to rename file</string>
     <string name="send">Send</string>
@@ -40,6 +42,7 @@
     <string name="copy_file_to_clipboard">copy to clipboard</string>
     <string name="the_folder_is_empty">The folder is empty!</string>
     <string name="search_nothing">search nothing</string>
+    <string name="selected">selected</string>
 
     <string-array name="general_dir">
         <item>Home</item>
