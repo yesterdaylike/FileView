@@ -6,7 +6,7 @@
         android:id="@+id/file_icon_iamgeview"
         android:layout_width="?android:attr/listPreferredItemHeight"
         android:layout_height="?android:attr/listPreferredItemHeight"
-        android:layout_marginStart="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:layout_marginLeft="@dimen/listItemPadding"
         android:scaleType="center"
         android:src="@drawable/ic_drive_floder" />
 
@@ -16,7 +16,7 @@
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:layout_toRightOf="@+id/file_icon_iamgeview"
         android:gravity="center_vertical"
-        android:paddingStart="?android:attr/expandableListPreferredItemIndicatorLeft"
+        android:paddingLeft="@dimen/listItemTextPadding"
         android:textAlignment="viewStart"
         android:textAppearance="?android:attr/textAppearanceListItem" >
     </TextView>
@@ -28,7 +28,7 @@
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@+id/file_icon_iamgeview"
         android:gravity="center_vertical"
-        android:paddingStart="?android:attr/expandableListPreferredItemIndicatorLeft"
+        android:paddingLeft="@dimen/listItemTextPadding"
         android:textAlignment="viewStart"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/darker_gray" >

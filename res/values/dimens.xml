@@ -5,5 +5,7 @@
     <dimen name="listPreferredItemHeightSmall">48dip</dimen>
     <dimen name="listPreferredItemHeightLarge">80dip</dimen>
     <dimen name="action_bar_default_height">48dip</dimen>
+    <dimen name="listItemPadding">20dip</dimen>
+    <dimen name="listItemTextPadding">5dip</dimen>
 
 </resources>

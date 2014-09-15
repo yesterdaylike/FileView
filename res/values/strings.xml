@@ -42,6 +42,7 @@
     <string name="copy_file_to_clipboard">copy to clipboard</string>
     <string name="the_folder_is_empty">The folder is empty!</string>
     <string name="search_nothing">search nothing</string>
+    <string name="apk_nothing">apk nothing</string>
     <string name="selected">selected</string>
 
     <string-array name="general_dir">
@@ -49,6 +50,7 @@
         <item>SD Card</item>
         <item>External SD</item>
         <item>USB Storage</item>
+        <item>APK</item>
     </string-array>
 
 </resources>

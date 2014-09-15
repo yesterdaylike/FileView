@@ -481,7 +481,7 @@ public class FileOpertion {
 	}
 
 
-	public static ArrayList<Uri> getUris(ArrayList<File> files) {
+	public static ArrayList<Uri> getUris(List<File> files) {
 		ArrayList<Uri> uris = new ArrayList<Uri>();
 		for (File mfile : files) {
 			addFileUri(mfile, uris);
@@ -503,12 +503,12 @@ public class FileOpertion {
 	}
 
 	private static final String [] filterList = {"com.google.android.gm"};
-	public static void shareFiles(Context context, File currentFile) {
+	public static void shareFiles(Context context, List<File> multi_path) {
 
-		ArrayList<File> multi_path = new ArrayList<File>();
-		multi_path.add(currentFile);
+		//ArrayList<File> multi_path = new ArrayList<File>();
+		//multi_path.add(currentFile);
 
-		String currenPath = currentFile.getPath();
+		String currenPath = multi_path.get(0).getPath();
 
 		if(currenPath == null ) {
 			return;
@@ -531,11 +531,6 @@ public class FileOpertion {
 		} else if (srcSends.size() > 1) {
 			ShareIntent.shareMultFile(context, "x-mixmedia/*", srcSends);
 		}
-		/*if (is_multi_choice) { // 若是在多选取状态下的话，则去除多选状态
-			is_multi_choice = !is_multi_choice;
-			multi_choice_process(is_multi_choice);
-		}
-		multi_path = new ArrayList<FileInfo>();*/
 	}
 
 	public void Detail(Context context,File file){
@@ -551,19 +546,21 @@ public class FileOpertion {
 
 	}
 
-	public static long getFileNumInDirectory(File file){
-		long size = 0;
-		File fileList[] = file.listFiles();
-		if(fileList!=null){
-			for (File fileTemp : fileList) {
-				if (fileTemp.isDirectory()) {
-					size += getFileNumInDirectory(fileTemp);
-				} else {
-					size++;
+	public static long getFileNum(File file){
+		int num = 0;
+		if(file.isFile()){
+			num = 1;
+		}
+		else{
+			File fileList[] = file.listFiles();
+			if(fileList != null){
+				for (File fileTemp : fileList) {
+					num += getFileNum(fileTemp);
 				}
 			}
 		}
-		return size;
+
+		return num;
 	}
 
 	public static long getFileSize(File file){
@@ -581,43 +578,43 @@ public class FileOpertion {
 		}
 		return size;
 	}
-	
+
 	private List<String> lstFile =new ArrayList<String>(); //结果 List
-	 
+
 	public void GetFiles(String Path, String Extension) 
 	{
-	    File[] files =new File(Path).listFiles();
-	 
-	    for (int i =0; i < files.length; i++)
-	    {
-	        File f = files[i];
-	        if (f.isFile())
-	        {
-	            if (f.getPath().substring(f.getPath().length() - Extension.length()).equals(Extension)) //判断扩展名
-	                lstFile.add(f.getPath());
-	        }
-	        else if (f.isDirectory() && f.getPath().indexOf("/.") == -1) //忽略点文件（隐藏文件/文件夹）
-	            GetFiles(f.getPath(), Extension);
-	    }
+		File[] files =new File(Path).listFiles();
+
+		for (int i =0; i < files.length; i++)
+		{
+			File f = files[i];
+			if (f.isFile())
+			{
+				if (f.getPath().substring(f.getPath().length() - Extension.length()).equals(Extension)) //判断扩展名
+					lstFile.add(f.getPath());
+			}
+			else if (f.isDirectory() && f.getPath().indexOf("/.") == -1) //忽略点文件（隐藏文件/文件夹）
+				GetFiles(f.getPath(), Extension);
+		}
 	}
-	
+
 	public static void searchFile(List<File> resultFile, File file, String str){
 		File[] fileList = file.listFiles();
 		if( fileList == null ){
 			return;
 		}
-		
+
 		for (File fileTemp : fileList) {
 			if(fileTemp.getName().toLowerCase().indexOf(str) != -1){
 				resultFile.add(fileTemp);
 			}
-			
+
 			if(fileTemp.isDirectory()){
 				searchFile(resultFile, fileTemp, str);
 			}
 		}
 	}
-	
+
 
 	public static Comparator<File> fileComparator = new Comparator<File>() {
 

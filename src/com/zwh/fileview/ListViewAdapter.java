@@ -1,12 +1,13 @@
 package com.zwh.fileview;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +19,13 @@ import android.widget.TextView;
 public class ListViewAdapter extends BaseAdapter {
 	private Context mContext;
 	private File[] fileList;
+	private String[] versionName;
+	private Drawable[] apkIcon;
+	private PackageManager mPackageManager;
+	private PackageInfo pkgInfo;
 
 	private boolean mIsSearch = false;
+	private boolean mIsApk = false;
 
 	private boolean actionModeStarted;
 	private boolean[] multiChoiceItemChecked;
@@ -32,8 +38,9 @@ public class ListViewAdapter extends BaseAdapter {
 	public void setFileData(File[] dataList){
 		if( null != dataList ){
 			Arrays.sort(dataList, FileOpertion.fileComparator);
+			versionName = new String[dataList.length];
+			apkIcon = new Drawable[dataList.length];
 		}
-
 		this.fileList = dataList;
 	}
 
@@ -74,14 +81,27 @@ public class ListViewAdapter extends BaseAdapter {
 		holder.fileNameTextView.setText(fileList[position].getName());
 
 		if (mIsSearch) {
-			holder.filePathTextView.setText(fileList[position].getParent());
+			if( versionName[position] == null ){
+				versionName[position] = fileList[position].getParent();
+			}
+			holder.filePathTextView.setText(versionName[position]);
+
+		}
+		else if(mIsApk){
+			if( versionName[position] == null ){
+				pkgInfo = mPackageManager.getPackageArchiveInfo(fileList[position].getPath(),PackageManager.GET_ACTIVITIES);  
+				versionName[position] = pkgInfo.versionName;
+			}
+			holder.filePathTextView.setText(versionName[position]);
 		}
 		else{
 			holder.filePathTextView.setText(null);
 		}
 
-		Drawable drawableLeft = FileOpertion.getDrawable(mContext, fileList[position]);
-		holder.fileIconImageView.setImageDrawable(drawableLeft);
+		if( apkIcon[position] == null ){
+			apkIcon[position] = FileOpertion.getDrawable(mContext, fileList[position]);
+		}
+		holder.fileIconImageView.setImageDrawable(apkIcon[position]);
 
 		updateBackground( position, convertView );
 		return convertView;
@@ -132,10 +152,10 @@ public class ListViewAdapter extends BaseAdapter {
 		}
 		return count;
 	}
-	
+
 	public List<File> getCheckedFile(){
 		List<File> checkedFileList = new ArrayList<File>();
-		
+
 		for (int i = 0; i < multiChoiceItemChecked.length; i++) {
 			if( multiChoiceItemChecked[i] ){
 				checkedFileList.add(fileList[i]);
@@ -159,6 +179,13 @@ public class ListViewAdapter extends BaseAdapter {
 
 	public void setSearchState(boolean flag){
 		mIsSearch = flag;
+	}
+
+	public void setApkFileState(boolean flag){
+		mIsApk = flag;
+		if( null == mPackageManager && flag){
+			mPackageManager = mContext.getPackageManager();
+		}
 	}
 
 	public void setItemChecked(int position, boolean flag){
