@@ -26,5 +26,5 @@ FileView
 </p>
 
 <p align="center">
-  <img src="https://onedrive.live.com/redir?resid=5E1821536AAA3686!17336&authkey=!AEAmkqG3A1Sja2A&v=3&ithint=photo%2cpng" alt="Screenshot"/>
+  <img src="https://u44f9a.bn1.livefilestore.com/y2miO3raUJCrRnKLdnfNofj0eT7Slwqw1vUIHUmJK5suVbR2b_X8RhjKjRFJ3pcexS3Fq8AQffUhjmAmEfTUv40F0vKEaag8TrKR0TerClmkYA/device-2014-09-16-090215.png?download&psid=1" alt="Screenshot"/>
 </p>
