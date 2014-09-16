@@ -1,9 +1,7 @@
 FileView
 ========
 
-FileView
-
-This is a file explorer application in android.
+**NOTE:** This is a file explorer application in android.
 
 support 
 
