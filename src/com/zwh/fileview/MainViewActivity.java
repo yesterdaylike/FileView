@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
@@ -31,7 +32,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -80,8 +80,10 @@ public class MainViewActivity extends Activity{
 
 
 		mIndexListView = (ListView) findViewById(R.id.index_view);
-		mIndexListView.setAdapter(new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.general_dir)));
+		SimpleAdapter adapter = new SimpleAdapter(this,getData(),R.layout.index_list_item,
+				new String[]{"title","img"},
+				new int[]{R.id.title,R.id.img});
+		mIndexListView.setAdapter(adapter);
 		mIndexListView.setOnItemClickListener(new DrawerItemClickListener());
 
 		setDrawerToggle();
@@ -92,6 +94,30 @@ public class MainViewActivity extends Activity{
 		if( null != path ){
 			refrestTab(path);
 		}
+	}
+
+	private List<Map<String, Object>> getData() {
+		String[] titles = getResources().getStringArray(R.array.general_dir);
+		int[] imgs = {
+				R.drawable.home,
+				R.drawable.sd_card,
+				R.drawable.external_sd,
+				R.drawable.usb_storage,
+				R.drawable.apk,
+		};
+
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+
+		Map<String, Object> map;
+
+		for (int i = 0; i < titles.length; i++) {
+			map = new HashMap<String, Object>();
+			map.put("title", titles[i]);
+			map.put("img", imgs[i]);
+			list.add(map);
+		}
+
+		return list;
 	}
 
 	private void initTab(){
