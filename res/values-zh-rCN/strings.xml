@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">文件夹</string>
+    <string name="drawer_close">侧边栏关闭</string>
+    <string name="drawer_open">侧边栏打开</string>
+    <string name="copy">复制</string>
+    <string name="delete">删除</string>
+    <string name="cut">剪贴</string>
+    <string name="paste">粘贴</string>
+    <string name="rename">重命名</string>
+    <string name="share">发送</string>
+    <string name="shortcut">桌面快捷图标</string>
+    <string name="detail">详细信息</string>
+    <string name="search">搜索</string>
+    <string name="add_floder">新建文件夹</string>
+    <string name="wrong_file_name">不是一个文件名</string>
+    <string name="directory_is_exist_already">该名字的文件夹已存在</string>
+    <string name="str_newdir_text">请输入文件夹名字:</string>
+    <string name="str_rename_text">输入新的名字:</string>
+    <string name="delete_file_failed">删除失败</string>
+    <string name="sure_delete_file">确认删除吗?</string>
+    <string name="sure_delete_file_2">确认删除</string>
+    <string name="sure_delete_file_2_end">文件 ? </string>
+    <string name="file_is_exist_already">该名字的文件已存在</string>
+    <string name="rename_file_failed">重命名失败</string>
+    <string name="send">发送</string>
+    <string name="can_read">可读</string>
+    <string name="can_write">可写</string>
+    <string name="can_execute">可执行</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
+    <string name="size">大小</string>
+    <string name="path">位置</string>
+    <string name="lastModified">修改时间</string>
+    <string name="file_num">文件数目</string>
+    <string name="no_apps_to_send">没有合适的应用. </string>
+    <string name="paste_file_failed">粘贴文件失败</string>
+    <string name="cut_file_failed">剪贴文件失败</string>
+    <string name="cut_file_to_clipboard">剪贴到剪贴板</string>
+    <string name="copy_file_to_clipboard">复制到复制板</string>
+    <string name="the_folder_is_empty">文件夹为空!</string>
+    <string name="search_nothing">没有搜索到任何东西</string>
+    <string name="apk_nothing">没有apk</string>
+    <string name="selected">选择</string>
+
+    <string-array name="general_dir">
+        <item>根目录</item>
+        <item>存储卡</item>
+        <item>外部存储卡</item>
+        <item>USB存储设备</item>
+        <item>应用</item>
+    </string-array>
+
+</resources>
