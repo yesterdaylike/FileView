@@ -5,13 +5,13 @@ FileView
 
 support 
 
-search
-add new floder
-paste
-copy
-delete
-cut
-rename
-share
-shortcut to desktop
-detail
+  search
+  add new floder
+  paste
+  copy
+  delete
+  cut
+  rename
+  share
+  shortcut to desktop
+  detail
