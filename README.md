@@ -22,7 +22,7 @@ FileView
 </p>
 
 <p align="center">
-  <img src="http://1drv.ms/1y9gtWg" alt="Screenshot"/>
+  <img src="https://u44e9a.bn1.livefilestore.com/y2pEox1AjjFvAk0mslyghYD0ImWrM33TRXii27YFqFAQ-500i3Cm2yca62QrPfFNBmh5VrXD4dqmIHNp0UyY2MltTbvOH2uqHhOqsYya5hSxXY/device-2014-09-16-090148.png?psid=1" alt="Screenshot"/>
 </p>
 
 <p align="center">
