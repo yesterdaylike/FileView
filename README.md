@@ -3,7 +3,7 @@ FileView
 
 **NOTE:** This is a file explorer application in android.
 
-support 
+<h5 id="function">Support function</h5>
 
   search  
   add new floder  
